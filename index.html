@@ -110,22 +110,28 @@
 
 				<section>
           <div class="normal">
-            <h2>nanoc Rules</h2>
-            <code class="ruby">
-compile '*' do
+            <h2>nanoc Rules (1)</h2>
+            <pre><code class="ruby" style="font-size:150%; line-height:120%; max-height:800px">compile '*' do
   unless rep.binary? then
     filter :erb
     case item[:extension]
     when 'textile' then
             filter :redcloth
     when 'md','markdown' then
-            filter :rdiscount, { :extensions => [ :smart ] }
+            filter :rdiscount,
+              { :extensions => [ :smart ] }
     end
     filter :colorize_syntax
     layout 'default'
   end
-end
+end</code></pre>
+          </div>
+				</section>
 
+				<section>
+          <div class="normal">
+            <h2>nanoc Rules (2)</h2>
+            <pre><code class="ruby" style="font-size:150%; line-height:120%">
 route '*' do
   if rep.binary? then
     item.identifier.chop + ".#{item[:extension]}"
@@ -133,7 +139,7 @@ route '*' do
     item.identifier + 'index.html'
   end
 end
-            </code>
+            </code></pre>
           </div>
 				</section>
 
