@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="de">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Statische Webseiten mit nanoc</title>
+
+		<meta name="description" content="Statische Webseiten mit nanoc">
+		<meta name="author" content="Stefan Schlott">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/cccs.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+          <div class="title">
+            <img class="header" src="img/title.png" />
+            <div class="belowheader">
+              <h1>Statische Webseiten mit nanoc</h1>
+            </div>
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>Warum statische Seiten?</h2>
+            <p>1x gerendert, 10.000x ausgeliefert
+            <p class="fragment">No PHP, no webapp ⇒ No webapp with security holes
+            <p class="fragment">Häufig: Verwaltung der Inhalte in git. Markdown ftw!
+            <p class="fragment">Static webspace is cheap (github pages, etc.)
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>Die „Platzhirsche“</h2>
+            <p><center><img src="img/jekyll.jpg" width="80%" /></center>
+            <p><center><img src="img/octopress.jpg" width="80%" /></center>
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>What's wrong with Octopress?</h2>
+            <p>Abgesehen von diversen „Detail-Schmerzen“ (fragt Octopress-Benutzer)...
+            <p class="fragment">Build-Zeiten!
+            <p class="fragment">It's completely blog-centric!
+          </div>
+				</section>
+
+				<section>
+          <div class="fill">
+            <img src="img/nohipster.jpg" />
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>Was ich will...</h2>
+            <p>Möglichst beliebige Eingabeformate (Markdown ist cool, aber wie wär's mit asciidoc?)
+            <p>Seiteninhalt mit git verwalten
+            <p><em>Meine</em> Organisationsstruktur
+            <p><em>Meine</em> Seitenstruktur
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>Generische statische Seitengeneratoren</h2>
+            <p>...ist wie das Verhältnis von<br/>Webapp-Framework:Wordpress zu Generator:Octopress
+            <p>Heiße Kandidaten: <a href="http://nanoc.ws/">nanoc</a> und <a href="http://www.jaspervdj.be/hakyll/">hakyll</a>.
+            <p>Beide: Konfigurierbarer Übersetzungsschritt von Quellen zur Ausgabe
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>nanoc Pipeline</h2>
+            <p>Data Sources: Quellen für „Items“ (Basiseinheit für ein „Ding“).
+            <br/>Standardquelle: Dateisystem
+            <p>Preprocessing: Items sind gelesen, aber noch nicht bearbeitet
+            <br/>In diesem Schritt: Items entfernen oder synthetische erzeugen
+            <p>Compilation: Umwandeln von Items ins Ausgabeformat (oder mehrere Formate = Representations!)
+            <p>Routing: Bestimmen von Dateiname und Pfad
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>nanoc Rules</h2>
+            <code class="ruby">
+compile '*' do
+  unless rep.binary? then
+    filter :erb
+    case item[:extension]
+    when 'textile' then
+            filter :redcloth
+    when 'md','markdown' then
+            filter :rdiscount, { :extensions => [ :smart ] }
+    end
+    filter :colorize_syntax
+    layout 'default'
+  end
+end
+
+route '*' do
+  if rep.binary? then
+    item.identifier.chop + ".#{item[:extension]}"
+  else
+    item.identifier + 'index.html'
+  end
+end
+            </code>
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>Was ich schon habe...</h2>
+            <p>Meine Seitenstruktur: Artikel, Artikelarchiv, Zuordnung von Artikeln zu Projekten oder Artikelserien
+            <p>Tags, RSS-Feed
+            <p>Ein wenig Metadaten-Management (Bildreferenzen)
+            <p>Import von Twitter und del.icio.us
+          </div>
+				</section>
+
+				<section>
+          <div class="normal">
+            <h2>Lessons learned</h2>
+            <p>Ruby ist behäbig (oder man braucht mehr Detailwissen)
+            <p>Meine „kleine Seite“ besteht aus &gt;700 Blogeinträgen. Ist eine Menge für solche Seitengeneratoren!
+            <p>Das Bauen statischer Generatoren erfordert mehr Knoffhoff als zunächst gedacht (incremental builds, performance)
+            <p>Beim nächsten Mal vielleicht doch lieber Webapp + Varnish?
+          </div>
+				</section>
+
+        <section>
+          <div class="normal">
+            <br />
+            <br />
+            <center><img src="img/cc.logo.svg" class="centered" width="50%" /></center>
+            <br />
+            <p>This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.</p>
+            <br />
+            <center><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" class="centered" src="img/cc.by-nc-sa.eu.svg" width="30%" /></a></center>
+          </div>
+        </section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
